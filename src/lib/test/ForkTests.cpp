@@ -40,6 +40,7 @@
 #include "osmutex.h"
 
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ForkTests);
@@ -64,6 +65,7 @@ void ForkTests::testFork()
 {
 	CK_RV rv;
 	pid_t pid;
+	int status;
 
 	// Just make sure that we finalize any previous failed tests
 	CRYPTOKI_F_PTR( C_Finalize(NULL_PTR) );
@@ -80,10 +82,15 @@ void ForkTests::testFork()
 		case 0:
 			rv = CRYPTOKI_F_PTR( C_Initialize(NULL_PTR) );
 			CPPUNIT_ASSERT(rv == CKR_CRYPTOKI_ALREADY_INITIALIZED);
+			rv = CRYPTOKI_F_PTR( C_Finalize(NULL_PTR) );
+			CPPUNIT_ASSERT(rv == CKR_OK);
+			_exit(0);
 			break;
 		default:
 			rv = CRYPTOKI_F_PTR( C_Initialize(NULL_PTR) );
 			CPPUNIT_ASSERT(rv == CKR_CRYPTOKI_ALREADY_INITIALIZED);
+			// wait for child
+			waitpid(pid, &status, 0);
 			break;
 	}
 
@@ -95,6 +102,7 @@ void ForkTests::testResetOnFork()
 {
 	CK_RV rv;
 	pid_t pid;
+	int status;
 
 	// Just make sure that we finalize any previous failed tests
 	CRYPTOKI_F_PTR( C_Finalize(NULL_PTR) );
@@ -118,11 +126,16 @@ void ForkTests::testResetOnFork()
 			/* For the child, the token is expected to be reset on fork */
 			rv = CRYPTOKI_F_PTR( C_Initialize(NULL_PTR) );
 			CPPUNIT_ASSERT(rv == CKR_OK);
+			rv = CRYPTOKI_F_PTR( C_Finalize(NULL_PTR) );
+			CPPUNIT_ASSERT(rv == CKR_OK);
+			_exit(0);
 			break;
 		default:
 			/* For the parent, the token is expected to be still initialized */
 			rv = CRYPTOKI_F_PTR( C_Initialize(NULL_PTR) );
 			CPPUNIT_ASSERT(rv == CKR_CRYPTOKI_ALREADY_INITIALIZED);
+			// wait for child
+			waitpid(pid, &status, 0);
 			break;
 	}
 
