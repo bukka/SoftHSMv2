@@ -115,6 +115,7 @@ std::auto_ptr<SoftHSM> SoftHSM::instance(NULL);
 
 static CK_RV newP11Object(CK_OBJECT_CLASS objClass, CK_KEY_TYPE keyType, CK_CERTIFICATE_TYPE certType, P11Object **p11object)
 {
+	DEBUG_MSG("Creating new P11 object - class: %lu, key type: %lu, cert type: %lu", objClass, keyType, certType);
 	switch(objClass) {
 		case CKO_DATA:
 			*p11object = new P11DataObj();
@@ -580,6 +581,8 @@ CK_RV SoftHSM::C_Initialize(CK_VOID_PTR pInitArgs)
 		WARNING_MSG("Could not open log file, using syslog");
 	}
 
+	DEBUG_MSG("Initializing SoftHSMv2 %s", PACKAGE_VERSION);
+
 	// Configure object store storage backend used by all tokens.
 	if (!ObjectStoreToken::selectBackend(Configuration::i()->getString("objectstore.backend", DEFAULT_OBJECTSTORE_BACKEND)))
 	{
@@ -627,6 +630,8 @@ CK_RV SoftHSM::C_Initialize(CK_VOID_PTR pInitArgs)
 // PKCS #11 finalisation function
 CK_RV SoftHSM::C_Finalize(CK_VOID_PTR pReserved)
 {
+	DEBUG_MSG("Finalizing SoftHSMv2");
+
 	if (!isInitialised) return CKR_CRYPTOKI_NOT_INITIALIZED;
 
 	// Must be set to NULL_PTR in this version of PKCS#11
