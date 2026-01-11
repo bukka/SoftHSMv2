@@ -78,6 +78,7 @@
 #endif
 
 /* Function definitions */
+int getLogLevel(void);
 bool setLogLevel(const std::string &loglevel);
 bool setLogFile(const std::string &logFilePath);
 void closeLogFile();

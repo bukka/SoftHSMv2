@@ -52,6 +52,11 @@ int softLogLevel = LOG_DEBUG;
 static FILE* logFile = nullptr;
 static Mutex* logMutex = nullptr;
 
+int getLogLevel(void)
+{
+	return softLogLevel;
+}
+
 bool setLogLevel(const std::string &loglevel)
 {
 	if (loglevel == "ERROR")
