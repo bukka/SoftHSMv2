@@ -3991,7 +3991,10 @@ CK_RV SoftHSM::MacSignInit(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechani
 
 	// Check if key can be used for signing
 	if (!key->getBooleanValue(CKA_SIGN, false))
+	{
+		DEBUG_MSG("No CKA_SIGN for key handle: %lu, private: %hhu", hKey, isPrivate);
 		return CKR_KEY_FUNCTION_NOT_PERMITTED;
+	}
 
 	// Check if the specified mechanism is allowed for the key
 	if (!isMechanismPermitted(key, pMechanism->mechanism))
@@ -4143,7 +4146,10 @@ CK_RV SoftHSM::AsymSignInit(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMechan
 
 	// Check if key can be used for signing
 	if (!key->getBooleanValue(CKA_SIGN, false))
+	{
+		DEBUG_MSG("No CKA_SIGN for key handle: %lu, private: %hhu", hKey, isPrivate);
 		return CKR_KEY_FUNCTION_NOT_PERMITTED;
+	}
 
 	// Check if the specified mechanism is allowed for the key
 	if (!isMechanismPermitted(key, pMechanism->mechanism))
@@ -4994,7 +5000,10 @@ CK_RV SoftHSM::MacVerifyInit(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMecha
 
 	// Check if key can be used for verifying
 	if (!key->getBooleanValue(CKA_VERIFY, false))
+	{
+		DEBUG_MSG("No CKA_VERIFY for key handle: %lu, private: %hhu", hKey, isPrivate);
 		return CKR_KEY_FUNCTION_NOT_PERMITTED;
+	}
 
 	// Check if the specified mechanism is allowed for the key
 	if (!isMechanismPermitted(key, pMechanism->mechanism))
@@ -5146,7 +5155,10 @@ CK_RV SoftHSM::AsymVerifyInit(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMech
 
 	// Check if key can be used for verifying
 	if (!key->getBooleanValue(CKA_VERIFY, false))
+	{
+		DEBUG_MSG("No CKA_VERIFY for key handle: %lu, private: %hhu", hKey, isPrivate);
 		return CKR_KEY_FUNCTION_NOT_PERMITTED;
+	}
 
 	// Check if the specified mechanism is allowed for the key
 	if (!isMechanismPermitted(key, pMechanism->mechanism))
