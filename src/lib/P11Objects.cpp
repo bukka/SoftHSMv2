@@ -297,6 +297,68 @@ CK_RV P11Object::saveTemplate(Token *token, bool isPrivate, CK_ATTRIBUTE_PTR pTe
 		return CKR_GENERAL_ERROR;
 	}
 
+	if (getLogLevel() == LOG_DEBUG)
+	{
+		std::string attrList;
+		attrList.reserve(ulAttributeCount * 15);
+
+		for (CK_ULONG i = 0; i < ulAttributeCount; i++)
+		{
+			char attrBuf[128];
+			CK_ATTRIBUTE_TYPE attrType = pTemplate[i].type;
+			CK_ULONG attrLen = pTemplate[i].ulValueLen;
+			CK_VOID_PTR attrVal = pTemplate[i].pValue;
+
+			if (i > 0) attrList += ", ";
+
+			if (attrVal == NULL)
+			{
+				snprintf(attrBuf, sizeof(attrBuf), "0x%04X=NULL", (unsigned int)attrType);
+			}
+			else if (attrLen == sizeof(CK_BBOOL))
+			{
+				CK_BBOOL val = *(CK_BBOOL*)attrVal;
+				snprintf(attrBuf, sizeof(attrBuf), "0x%04X=%s", (unsigned int)attrType, val ? "TRUE" : "FALSE");
+			}
+			else if (attrLen == sizeof(CK_ULONG))
+			{
+				CK_ULONG val = *(CK_ULONG*)attrVal;
+				snprintf(attrBuf, sizeof(attrBuf), "0x%04X=0x%lX", (unsigned int)attrType, (unsigned long)val);
+			}
+			else if (attrLen <= 8)
+			{
+				snprintf(attrBuf, sizeof(attrBuf), "0x%04X=", (unsigned int)attrType);
+				size_t offset = strlen(attrBuf);
+				unsigned char* bytes = (unsigned char*)attrVal;
+				for (CK_ULONG j = 0; j < attrLen && offset < sizeof(attrBuf) - 3; j++)
+				{
+					snprintf(attrBuf + offset, sizeof(attrBuf) - offset, "%02X", bytes[j]);
+					offset += 2;
+				}
+			}
+			else
+			{
+				// print just length for longer attrs
+				snprintf(attrBuf, sizeof(attrBuf), "0x%04X=[%lu bytes]", (unsigned int)attrType, (unsigned long)attrLen);
+			}
+
+			attrList += attrBuf;
+		}
+
+		const char* opName = "UNKNOWN";
+		switch (op)
+		{
+			case OBJECT_OP_CREATE: opName = "CREATE"; break;
+			case OBJECT_OP_SET: opName = "SET"; break;
+			case OBJECT_OP_COPY: opName = "COPY"; break;
+			case OBJECT_OP_GENERATE: opName = "GENERATE"; break;
+			case OBJECT_OP_UNWRAP: opName = "UNWRAP"; break;
+		}
+
+		DEBUG_MSG("Template for object %p %s: set %lu attribute(s): %s",
+			(void*)this, opName, (unsigned long)ulAttributeCount, attrList.c_str());
+	}
+
 	return CKR_OK;
 }
 
