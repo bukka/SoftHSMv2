@@ -206,7 +206,7 @@ void HandleManager::sessionClosed(const CK_SESSION_HANDLE hSession)
 			std::map< CK_ULONG, Handle>::iterator hit = handles.find(*oit);
 			if (hit != handles.end()) {
 				objects.erase(hit->second.object);
-				DEBUG_MSG("Erasing object %lu for closed session %lu", it->first, hSession);
+				DEBUG_MSG("Erasing object %lu for closed session %lu", hit->first, hSession);
 				slotHandles[slotID].erase(*oit);
 				handles.erase(hit);
 			}
