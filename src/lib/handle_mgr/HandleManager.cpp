@@ -173,9 +173,9 @@ void HandleManager::destroyObject(const CK_OBJECT_HANDLE hObject)
 
 		objects.erase(it->second.object);
 		handles.erase(it);
-		DEBUG_MSG("Destroed object handle: %lu", hObject);
+		DEBUG_MSG("Destroyed object handle: %lu", hObject);
 	} else {
-		DEBUG_MSG("Destroying object handle %lu that does not exist", hObject);
+		DEBUG_MSG("Cannot destroy handle %lu that is not found or not an object handle", hObject);
 	}
 }
 
@@ -233,7 +233,7 @@ void HandleManager::allSessionsClosed(const CK_SLOT_ID slotID, bool isLocked)
 	MutexLocker lock(isLocked ? NULL : handlesMutex);
 
 
-	DEBUG_MSG("Closing all sessions for slot %lu", slotID); 
+	DEBUG_MSG("Closing all sessions for slot %lu", slotID);
 
 	// Erase all "session", "session object" and "token object" handles for a given slot id
 	// using the per-slot index instead of scanning the entire handles map.
